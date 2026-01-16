@@ -1,0 +1,1 @@
+npx electron-icon-builder --input=assets/icons/icon.png  --output=./assets/icons

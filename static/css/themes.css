@@ -1,0 +1,113 @@
+/**
+ * CSS Theme Variables
+ * VS Code-style theme system with dark and light variants
+ */
+
+/* ============================================
+   Dark Theme (Default)
+   ============================================ */
+[data-theme="dark"] {
+  /* Background colors */
+  --bg-workbench: #1E1E1E;
+  --bg-editor: #252526;
+  --bg-hover: #2A2A2A;
+  --bg-active: #323233;
+  
+  /* Foreground colors */
+  --fg-primary: #FFFFFF;
+  --fg-secondary: #E0E0E0;
+  --fg-muted: #B0B0B0;
+  --fg-disabled: #777777;
+  
+  /* Border colors */
+  --border-subtle: #3C3C3C;
+  --border-focus: #007ACC;
+  
+  /* Accent colors */
+  --accent-primary: #007ACC;
+  --accent-primary-hover: #0098FF;
+  --accent-success: #4CAF50;
+  --accent-warning: #FFB300;
+  --accent-error: #F44747;
+  
+  /* Interactive elements */
+  --btn-primary-bg: #007ACC;
+  --btn-primary-fg: #FFFFFF;
+  --btn-primary-hover: #0098FF;
+  --btn-secondary-bg: #3C3C3C;
+  --btn-secondary-fg: #CCCCCC;
+  --btn-secondary-hover: #4C4C4C;
+  
+  /* Input elements */
+  --input-bg: #3C3C3C;
+  --input-fg: #CCCCCC;
+  --input-border: #3C3C3C;
+  --input-focus-border: #007ACC;
+  
+  /* Modal/overlay */
+  --modal-overlay: rgba(0, 0, 0, 0.6);
+  --modal-bg: #252526;
+  
+  /* Scrollbar */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #424242;
+  --scrollbar-thumb-hover: #4E4E4E;
+}
+
+/* ============================================
+   Light Theme
+   ============================================ */
+[data-theme="light"] {
+  /* Background colors */
+  --bg-workbench: #F3F3F3;
+  --bg-editor: #FFFFFF;
+  --bg-hover: #E8E8E8;
+  --bg-active: #D6D6D6;
+  
+  /* Foreground colors */
+  --fg-primary: #000000;
+  --fg-secondary: #3C3C3C;
+  --fg-muted: #666666;
+  --fg-disabled: #999999;
+  
+  /* Border colors */
+  --border-subtle: #D4D4D4;
+  --border-focus: #007ACC;
+  
+  /* Accent colors */
+  --accent-primary: #007ACC;
+  --accent-primary-hover: #005A9E;
+  --accent-success: #2E7D32;
+  --accent-warning: #FFA000;
+  --accent-error: #D32F2F;
+  
+  /* Interactive elements */
+  --btn-primary-bg: #007ACC;
+  --btn-primary-fg: #FFFFFF;
+  --btn-primary-hover: #005A9E;
+  --btn-secondary-bg: #E0E0E0;
+  --btn-secondary-fg: #1E1E1E;
+  --btn-secondary-hover: #D0D0D0;
+  
+  /* Input elements */
+  --input-bg: #FFFFFF;
+  --input-fg: #1E1E1E;
+  --input-border: #D4D4D4;
+  --input-focus-border: #007ACC;
+  
+  /* Modal/overlay */
+  --modal-overlay: rgba(0, 0, 0, 0.4);
+  --modal-bg: #FFFFFF;
+  
+  /* Scrollbar */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #C0C0C0;
+  --scrollbar-thumb-hover: #A0A0A0;
+}
+
+/* ============================================
+   Theme Transition
+   ============================================ */
+body {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}

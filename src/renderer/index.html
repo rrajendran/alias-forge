@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AliasForge</title>
+  <link rel="stylesheet" href="../../static/css/themes.css">
+  <link rel="stylesheet" href="../../static/css/main.css">
+</head>
+<body data-theme="dark">
+  <!-- Main application container -->
+  <div class="app-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="app-title">AliasForge</h1>
+        <p class="app-tagline">Shape your shortcuts once</p>
+        <div class="shell-info" id="shell-info">
+          <span class="shell-badge" id="shell-badge">Detecting...</span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <section class="sidebar-section">
+        <h2 class="section-title">Quick Actions</h2>
+        <button class="sidebar-button" id="import-aliases">
+          <span class="button-icon">📥</span>
+          Import from Shell
+        </button>
+        <button class="sidebar-button" id="export-aliases">
+          <span class="button-icon">💾</span>
+          Save to Shell
+        </button>
+      </section>
+
+      <!-- Tags -->
+      <section class="sidebar-section">
+        <h2 class="section-title">Filter by Tags</h2>
+        <div class="tag-filters" id="tag-filters">
+          <button class="tag-chip active" data-tag="all">All</button>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="sidebar-section">
+        <h2 class="section-title">Statistics</h2>
+        <div class="stats">
+          <div class="stat-item">
+            <span class="stat-label">Total</span>
+            <span class="stat-value" id="stat-total">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Enabled</span>
+            <span class="stat-value" id="stat-enabled">0</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Main content area -->
+    <main class="main-content">
+      <!-- Top tabs -->
+      <nav class="tabs">
+        <button class="tab active" data-tab="aliases">Aliases</button>
+        <button class="tab" data-tab="settings">Settings</button>
+      </nav>
+
+      <!-- Tab content -->
+      <div class="tab-content">
+        
+        <!-- Aliases tab -->
+        <div class="tab-pane active" id="aliases-pane">
+          <div class="content-header">
+            <div class="search-bar">
+              <input type="text" id="alias-search" placeholder="Search aliases..." class="search-input">
+            </div>
+            <button class="btn-primary" id="add-alias">+ New Alias</button>
+          </div>
+
+          <div class="alias-list-container">
+            <table class="alias-table">
+              <thead>
+                <tr>
+                  <th class="sortable" data-sort="name">Name <span class="sort-indicator"></span></th>
+                  <th class="sortable" data-sort="command">Command <span class="sort-indicator"></span></th>
+                  <th class="sortable" data-sort="description">Description <span class="sort-indicator"></span></th>
+                  <th>Tags</th>
+                  <th class="sortable" data-sort="enabled">Enabled <span class="sort-indicator"></span></th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="alias-table-body">
+                <tr class="empty-state">
+                  <td colspan="6">
+                    <div class="empty-message">
+                      <p>No aliases yet</p>
+                      <p class="empty-hint">Click "Import from Shell" to load existing aliases or "New Alias" to create one</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="pagination" id="pagination"></div>
+          </div>
+        </div>
+
+        <!-- Settings tab -->
+        <div class="tab-pane" id="settings-pane">
+          <div class="settings-container">
+            <h2>Settings</h2>
+            
+            <section class="settings-section">
+              <h3>Appearance</h3>
+              <div class="setting-item">
+                <label for="theme-toggle">Theme</label>
+                <select id="theme-toggle" class="setting-input">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </select>
+              </div>
+            </section>
+            
+            <section class="settings-section">
+              <h3>Display</h3>
+              <div class="setting-item">
+                <label for="page-size">Items per page</label>
+                <input type="number" id="page-size" class="setting-input" min="5" max="100" value="10">
+              </div>
+            </section>
+
+            <section class="settings-section">
+              <h3>Export Paths</h3>
+              <div id="export-paths">
+                <!-- Will be populated dynamically based on platform -->
+              </div>
+            </section>
+
+            <section class="settings-section">
+              <h3>Backup</h3>
+              <div class="setting-item">
+                <label for="backup-count">Backups to keep</label>
+                <input type="number" id="backup-count" class="setting-input" min="1" max="20" value="5">
+              </div>
+            </section>
+
+            <div class="settings-actions">
+              <button class="btn-primary" id="save-settings">Save Settings</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal for alias editor -->
+  <div class="modal" id="alias-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">New Alias</h2>
+        <button class="modal-close" id="close-modal">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="alias-name">Name *</label>
+          <input type="text" id="alias-name" class="form-input" placeholder="e.g., gs, ll, k">
+        </div>
+
+        <div class="form-group">
+          <label for="alias-description">Description</label>
+          <input type="text" id="alias-description" class="form-input" placeholder="What does this alias do?">
+        </div>
+
+        <div class="form-group">
+          <label for="alias-tags">Tags</label>
+          <input type="text" id="alias-tags" class="form-input" placeholder="git, docker, etc. (comma-separated)">
+        </div>
+
+        <div class="form-group">
+          <label for="alias-command">Command *</label>
+          <textarea id="alias-command" class="form-textarea" placeholder="e.g., git status"></textarea>
+          <small class="form-hint">The actual command that will be executed</small>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="cancel-alias">Cancel</button>
+        <button class="btn-primary" id="save-alias">Save Alias</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification toast -->
+  <div class="toast" id="toast">
+    <span class="toast-message" id="toast-message"></span>
+  </div>
+
+  <script src="../../static/js/main.js"></script>
+</body>
+</html>
