@@ -1,6 +1,6 @@
 {
   "name": "alias-forge",
-  "version": "1.0.0",
+  "version": "0.0.9",
   "description": "Shape your shortcuts once, use them everywhere.",
   "main": "src/main/main.js",
   "scripts": {
