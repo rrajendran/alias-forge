@@ -17,7 +17,8 @@ const ALLOWED_CHANNELS = {
   aliases: ["aliases:load", "aliases:save", "aliases:import", "aliases:export"],
   shell: ["shell:detect"],
   file: ["file:read", "file:write", "file:backup"],
-  updater: ["updater:check"],
+  updater: ["updater:check", "update-status"],
+  app: ["app:getLogPath"],
   tray: ["tray:get-config", "tray:set-config"]
 };
 
@@ -74,6 +75,19 @@ contextBridge.exposeInMainWorld("api", {
     read: (filePath) => invokeSecure("file:read", filePath),
     write: (filePath, content) => invokeSecure("file:write", filePath, content),
     backup: (filePath) => invokeSecure("file:backup", filePath)
+  },
+
+  // App utilities
+  app: {
+    getLogPath: () => invokeSecure("app:getLogPath")
+  },
+
+  // Event listening
+  on: (channel, callback) => {
+    if (!validateChannel(channel)) {
+      throw new Error(`IPC channel not allowed: ${channel}`);
+    }
+    ipcRenderer.on(channel, callback);
   },
 
   // General invoke for any allowed channel

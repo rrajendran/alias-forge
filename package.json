@@ -1,12 +1,13 @@
 {
-  "name": "alias-forge",
-  "version": "1.0.0",
+  "name": "AliasForge",
+  "version": "0.0.1",
   "description": "Shape your shortcuts once, use them everywhere.",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
     "build": "electron-builder",
+    "clean": "rm -rf dist",
     "build:mac": "electron-builder --mac",
     "build:win": "electron-builder --win",
     "build:linux": "electron-builder --linux",
@@ -29,7 +30,10 @@
     "cli",
     "cross-platform"
   ],
-  "author": "AliasForge Team",
+  "author": {
+    "name": "Ramesh Rajendran",
+    "email": "rameshchinnu61@gmail.com"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/rrajendran/alias-forge.git"
@@ -54,7 +58,8 @@
         "owner": "rrajendran",
         "repo": "alias-forge",
         "releaseType": "release",
-        "publishAutoUpdate": true
+        "publishAutoUpdate": true,
+        "channel": "latest"
       }
     ],
     "directories": {
@@ -70,6 +75,7 @@
     "mac": {
       "category": "public.app-category.developer-tools",
       "icon": "assets/icons/mac/icon.icns",
+      "sign": false,
       "target": [
         {
           "target": "dmg",

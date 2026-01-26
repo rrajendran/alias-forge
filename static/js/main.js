@@ -44,6 +44,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   await detectShell();
   await loadAliases(); // Will auto-load from shell
   setupEventListeners();
+  
+  // Listen for update status events
+  window.api.on('update-status', (event, data) => {
+    handleUpdateStatus(data);
+  });
+  
   updateStats();
   // Remove the startup loader once initial UI is ready
   hideStartupLoader();
@@ -58,6 +64,138 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize tooltips
   initTooltips();
 });
+
+// ============================================
+// Update Status Handling
+// ============================================
+function handleUpdateStatus(updateData) {
+  const updateStatus = document.getElementById("update-status");
+  const updateMessage = document.getElementById("update-message");
+  
+  if (!updateStatus || !updateMessage) {
+    console.warn('Update status elements not found');
+    return;
+  }
+  
+  // Show the update status section
+  updateStatus.style.display = 'block';
+  
+  const { status, data } = updateData;
+  
+  switch (status) {
+    case 'checking':
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-spinner fa-spin"></i> Checking for updates...
+        </div>
+      `;
+      break;
+      
+    case 'available':
+      updateMessage.innerHTML = `
+        <div style="color: var(--success-fg);">
+          <i class="fas fa-check-circle"></i> Update available: Version ${data.version}
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          A new version is available for download.
+        </div>
+      `;
+      break;
+      
+    case 'not-available':
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-check-circle"></i> You are using the latest version
+        </div>
+      `;
+      break;
+      
+    case 'downloading':
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-download"></i> Downloading update...
+        </div>
+      `;
+      break;
+      
+    case 'download-progress':
+      const percent = Math.round(data.percent || 0);
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-download"></i> Downloading update: ${percent}%
+        </div>
+        <div style="width: 100%; height: 4px; background: var(--bg-secondary); border-radius: 2px; margin-top: 4px;">
+          <div style="width: ${percent}%; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s ease;"></div>
+        </div>
+      `;
+      break;
+      
+    case 'downloaded':
+      updateMessage.innerHTML = `
+        <div style="color: var(--success-fg);">
+          <i class="fas fa-check-circle"></i> Update downloaded successfully
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          The update will be installed when you restart the application.
+        </div>
+      `;
+      break;
+      
+    case 'deferred':
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-clock"></i> Update deferred
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          You can check for updates again later.
+        </div>
+      `;
+      break;
+      
+    case 'error':
+      updateMessage.innerHTML = `
+        <div style="color: var(--error-fg);">
+          <i class="fas fa-circle-xmark"></i> Update check failed
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          ${data.message || 'Please try again later'}
+        </div>
+      `;
+      break;
+      
+    case 'asset-processed':
+      updateMessage.innerHTML = `
+        <div style="color: var(--success-fg);">
+          <i class="fas fa-check-circle"></i> Download completed
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          The update file has been downloaded and processed.
+        </div>
+        <button onclick="openDownloadFolder('${data.path}')" style="margin-top: 8px; padding: 4px 8px; background: var(--accent); color: var(--bg); border: none; border-radius: 4px; cursor: pointer;">
+          Open Download Folder
+        </button>
+      `;
+      break;
+      
+    default:
+      console.warn('Unknown update status:', status);
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-info-circle"></i> Status: ${status}
+        </div>
+      `;
+  }
+}
+
+// Function to open the download folder
+function openDownloadFolder(fullPath) {
+  if (!fullPath) return;
+  // Get directory path from full file path
+  const dirPath = fullPath.substring(0, fullPath.lastIndexOf('/')) || 
+                  fullPath.substring(0, fullPath.lastIndexOf('\\')) || 
+                  fullPath;
+  window.api.invoke('open-folder', dirPath);
+}
 
 // Simple tooltip implementation for elements with data-tooltip
 function initTooltips() {
@@ -820,6 +958,103 @@ function saveAliasFromModal() {
 }
 
 // ============================================
+// Update Status Handling
+// ============================================
+function handleUpdateStatus(data) {
+  const updateStatus = document.getElementById("update-status");
+  const updateMessage = document.getElementById("update-message");
+  
+  if (!updateStatus || !updateMessage) return;
+  
+  updateStatus.style.display = 'block';
+  
+  switch (data.status) {
+    case 'checking':
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-spinner fa-spin"></i> Checking for updates...
+        </div>
+      `;
+      break;
+      
+    case 'available':
+      updateMessage.innerHTML = `
+        <div style="color: var(--accent-primary); font-weight: 600;">
+          <i class="fas fa-download"></i> Update available: v${data.data.version}
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          Downloading update...
+        </div>
+      `;
+      break;
+      
+    case 'downloading':
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-spinner fa-spin"></i> Downloading update...
+        </div>
+      `;
+      break;
+      
+    case 'download-progress':
+      const percent = Math.round(data.data.percent || 0);
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-download"></i> Downloading update... ${percent}%
+        </div>
+        <div style="width: 100%; height: 4px; background: var(--bg-secondary); margin-top: 4px; border-radius: 2px;">
+          <div style="width: ${percent}%; height: 100%; background: var(--accent-primary); border-radius: 2px; transition: width 0.3s;"></div>
+        </div>
+      `;
+      break;
+      
+    case 'downloaded':
+      updateMessage.innerHTML = `
+        <div style="color: var(--success-fg); font-weight: 600;">
+          <i class="fas fa-check-circle"></i> Update downloaded: v${data.data.version}
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          Installing update...
+        </div>
+      `;
+      break;
+      
+    case 'not-available':
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-primary);">
+          <i class="fas fa-circle-check"></i> You're running the latest version
+        </div>
+      `;
+      break;
+      
+    case 'deferred':
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-clock"></i> Update deferred
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          You can check for updates again later
+        </div>
+      `;
+      break;
+      
+    case 'error':
+      updateMessage.innerHTML = `
+        <div style="color: var(--error-fg);">
+          <i class="fas fa-circle-xmark"></i> Update error
+        </div>
+        <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
+          ${data.data.message || 'Please try again later'}
+        </div>
+      `;
+      break;
+      
+    default:
+      console.log('Unknown update status:', data.status);
+  }
+}
+
+// ============================================
 // Event Listeners
 // ============================================
 function setupEventListeners() {
@@ -938,29 +1173,29 @@ function setupEventListeners() {
       checkUpdatesBtn.disabled = true;
       icon.classList.add('fa-spin');
       updateStatus.style.display = 'block';
-      updateMessage.textContent = 'Checking for updates...';
-      updateMessage.style.color = 'var(--fg-secondary)';
+      updateMessage.innerHTML = `
+        <div style="color: var(--fg-secondary);">
+          <i class="fas fa-spinner fa-spin"></i> Checking for updates...
+        </div>
+      `;
       
       try {
-        // Request update check via IPC
+        // Request update check via IPC - this will trigger async events
         const result = await window.api.invoke('updater:check');
         
-        if (result.updateAvailable) {
+        // The result is just for immediate feedback, events will handle ongoing status
+        if (!result.success) {
           updateMessage.innerHTML = `
-            <div style="color: var(--accent-primary); font-weight: 600;">
-              <i class="fas fa-circle-check"></i> Update available: v${result.version}
+            <div style="color: var(--error-fg);">
+              <i class="fas fa-circle-xmark"></i> Failed to check for updates
             </div>
             <div style="color: var(--fg-secondary); margin-top: 4px; font-size: 12px;">
-              ${result.releaseNotes || 'New version available for download'}
-            </div>
-          `;
-        } else {
-          updateMessage.innerHTML = `
-            <div style="color: var(--fg-primary);">
-              <i class="fas fa-circle-check"></i> You're running the latest version
+              ${result.error || 'Please try again later'}
             </div>
           `;
         }
+        // If successful, the events will update the UI with progress/download status
+        
       } catch (error) {
         updateMessage.innerHTML = `
           <div style="color: var(--error-fg);">

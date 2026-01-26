@@ -3,6 +3,11 @@ const path = require("path");
 const fs = require("fs").promises;
 const { exec } = require("child_process");
 const { promisify } = require("util");
+const log = require('electron-log');
+
+// Basic log configuration (will be updated after app ready)
+log.transports.file.level = 'info';
+log.transports.console.level = 'debug';
 
 // Import updater and tray modules
 const updater = require("./updater");
@@ -107,14 +112,25 @@ function validateFilePath(filePath) {
 // ============================================
 
 app.whenReady().then(async () => {
+  // Configure electron-log after app is ready
+  log.transports.file.level = 'info';
+  log.transports.console.level = 'debug';
+
+  // Log the log file location on startup
+  const logPath = log.transports.file.getFile().path;
+  log.info('========================================');
+  log.info('Application started');
+  log.info('Log file location:', logPath);
+  log.info('========================================');
+
   await ensureDataDirectory();
   await setupIpcHandlers();
   createMainWindow();
 
-  // Initialize updater (production only)
+  // Initialize updater (production and development with --dev flag)
   if (!app.isPackaged && !process.argv.includes("--dev")) {
-    // Skip updater in development
-  } else if (app.isPackaged) {
+    // Skip updater in development without --dev flag
+  } else {
     updater.init(mainWindow);
   }
 
@@ -144,11 +160,21 @@ app.on("window-all-closed", () => {
 
 app.on("before-quit", () => {
   // Cleanup
+  log.info('Application shutting down');
   if (updater) {
     updater.cleanup();
   }
   if (tray) {
     tray.cleanup();
+  }
+  // Ensure logs are flushed before exit
+  try {
+    if (log.transports.file && typeof log.transports.file.flush === 'function') {
+      log.transports.file.flush();
+    }
+  } catch (error) {
+    // Ignore flush errors during shutdown
+    console.warn('Failed to flush logs during shutdown:', error.message);
   }
 });
 
@@ -316,13 +342,49 @@ async function setupIpcHandlers() {
   ipcMain.handle("updater:check", async () => {
     try {
       if (updater && typeof updater.checkForUpdates === 'function') {
-        await updater.checkForUpdates(false);
-        // Return result will come via update events
-        return { success: true, checking: true };
+        const updateInfo = await updater.checkForUpdates(false);
+        
+        if (updateInfo) {
+          return {
+            success: true,
+            updateAvailable: true,
+            version: updateInfo.version,
+            releaseNotes: updateInfo.releaseNotes || ''
+          };
+        } else {
+          return {
+            success: true,
+            updateAvailable: false
+          };
+        }
       }
       return { success: false, error: 'Updater not available' };
     } catch (err) {
       console.error("Failed to check for updates:", err);
+      return { success: false, error: err.message };
+    }
+  });
+
+  // Get log file path
+  ipcMain.handle("app:getLogPath", () => {
+    try {
+      const logPath = log.transports.file.getFile().path;
+      log.info('Log path requested:', logPath);
+      return { success: true, logPath };
+    } catch (err) {
+      log.error('Failed to get log path:', err);
+      return { success: false, error: err.message };
+    }
+  });
+
+  // Open folder in file explorer
+  ipcMain.handle("open-folder", async (_, folderPath) => {
+    try {
+      const { shell } = require('electron');
+      await shell.openPath(folderPath);
+      return { success: true };
+    } catch (err) {
+      log.error('Failed to open folder:', err);
       return { success: false, error: err.message };
     }
   });
