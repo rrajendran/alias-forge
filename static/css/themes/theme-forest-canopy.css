@@ -1,0 +1,64 @@
+/**
+ * Theme: Forest Canopy
+ * Description: Modern nature theme with earthy greens and natural tones
+ * Type: light
+ */
+
+[data-theme="forest-canopy"] {
+  /* Background colors - natural and calming */
+  --bg-workbench: #F8FAED;
+  --bg-editor: #FDFEF8;
+  --bg-hover: #F2F5E3;
+  --bg-active: #E8EDD5;
+  --bg-sidebar: #F5F8E8;
+  
+  /* Foreground colors - forest tones */
+  --fg-primary: #1A3A28;
+  --fg-secondary: #2F5440;
+  --fg-muted: #5A7A67;
+  --fg-disabled: #8AA092;
+  
+  /* Border colors - natural accents */
+  --border-subtle: #D4E0C8;
+  --border-focus: #658C58;
+  --border-active: #31694E;
+  
+  /* Accent colors - earth palette */
+  --accent-primary: #658C58;
+  --accent-primary-hover: #527346;
+  --accent-success: #31694E;
+  --accent-warning: #B5A642;
+  --accent-error: #A0522D;
+  --accent-info: #658C58;
+  
+  /* Interactive elements - Buttons */
+  --btn-primary-bg: #658C58;
+  --btn-primary-fg: #FFFFFF;
+  --btn-primary-hover: #527346;
+  --btn-secondary-bg: #F5F8E8;
+  --btn-secondary-fg: #1A3A28;
+  --btn-secondary-hover: #F2F5E3;
+  
+  /* Interactive elements - Inputs */
+  --input-bg: #FDFEF8;
+  --input-fg: #1A3A28;
+  --input-border: #D4E0C8;
+  --input-focus-border: #658C58;
+  --input-placeholder: #5A7A67;
+  
+  /* Modal/Overlay */
+  --modal-overlay: rgba(49, 105, 78, 0.25);
+  --modal-bg: #FDFEF8;
+  
+  /* Scrollbar */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #BBC863;
+  --scrollbar-thumb-hover: #658C58;
+  
+  /* Syntax highlighting */
+  --syntax-keyword: #31694E;
+  --syntax-string: #8B7D3A;
+  --syntax-comment: #8AA092;
+  --syntax-function: #658C58;
+  --syntax-variable: #BBC863;
+}

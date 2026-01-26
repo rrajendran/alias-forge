@@ -1,0 +1,64 @@
+/**
+ * Theme: Dark
+ * Description: Modern dark theme with soft contrasts and vibrant accents
+ * Type: dark
+ */
+
+[data-theme="dark"] {
+  /* Background colors - softer, more layered */
+  --bg-workbench: #0F1419;
+  --bg-editor: #1A1F26;
+  --bg-hover: #232930;
+  --bg-active: #2D333D;
+  --bg-sidebar: #141920;
+  
+  /* Foreground colors - refined contrast */
+  --fg-primary: #E6EDF3;
+  --fg-secondary: #C9D1D9;
+  --fg-muted: #8B949E;
+  --fg-disabled: #6E7681;
+  
+  /* Border colors - subtle separation */
+  --border-subtle: #30363D;
+  --border-focus: #388BFD;
+  --border-active: #58A6FF;
+  
+  /* Accent colors - vibrant and modern */
+  --accent-primary: #2F81F7;
+  --accent-primary-hover: #58A6FF;
+  --accent-success: #3FB950;
+  --accent-warning: #D29922;
+  --accent-error: #F85149;
+  --accent-info: #1F6FEB;
+  
+  /* Interactive elements - Buttons */
+  --btn-primary-bg: #2F81F7;
+  --btn-primary-fg: #FFFFFF;
+  --btn-primary-hover: #1F6FEB;
+  --btn-secondary-bg: #21262D;
+  --btn-secondary-fg: #C9D1D9;
+  --btn-secondary-hover: #30363D;
+  
+  /* Interactive elements - Inputs */
+  --input-bg: #0D1117;
+  --input-fg: #E6EDF3;
+  --input-border: #30363D;
+  --input-focus-border: #388BFD;
+  --input-placeholder: #6E7681;
+  
+  /* Modal/Overlay */
+  --modal-overlay: rgba(1, 4, 9, 0.75);
+  --modal-bg: #161B22;
+  
+  /* Scrollbar */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #3B444D;
+  --scrollbar-thumb-hover: #545D68;
+  
+  /* Syntax highlighting */
+  --syntax-keyword: #FF7B72;
+  --syntax-string: #A5D6FF;
+  --syntax-comment: #8B949E;
+  --syntax-function: #D2A8FF;
+  --syntax-variable: #79C0FF;
+}

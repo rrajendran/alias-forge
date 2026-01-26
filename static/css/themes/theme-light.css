@@ -1,0 +1,64 @@
+/**
+ * Theme: Light
+ * Description: Modern light theme with soft backgrounds and vibrant accents
+ * Type: light
+ */
+
+[data-theme="light"] {
+  /* Background colors - clean and airy */
+  --bg-workbench: #FAFBFC;
+  --bg-editor: #FFFFFF;
+  --bg-hover: #F6F8FA;
+  --bg-active: #E1E4E8;
+  --bg-sidebar: #F6F8FA;
+  
+  /* Foreground colors - refined contrast */
+  --fg-primary: #1F2328;
+  --fg-secondary: #57606A;
+  --fg-muted: #6E7781;
+  --fg-disabled: #8C959F;
+  
+  /* Border colors - subtle separation */
+  --border-subtle: #D0D7DE;
+  --border-focus: #0969DA;
+  --border-active: #0969DA;
+  
+  /* Accent colors - vibrant and accessible */
+  --accent-primary: #0969DA;
+  --accent-primary-hover: #0550AE;
+  --accent-success: #1A7F37;
+  --accent-warning: #BF8700;
+  --accent-error: #CF222E;
+  --accent-info: #0969DA;
+  
+  /* Interactive elements - Buttons */
+  --btn-primary-bg: #0969DA;
+  --btn-primary-fg: #FFFFFF;
+  --btn-primary-hover: #0550AE;
+  --btn-secondary-bg: #F6F8FA;
+  --btn-secondary-fg: #24292F;
+  --btn-secondary-hover: #E1E4E8;
+  
+  /* Interactive elements - Inputs */
+  --input-bg: #FFFFFF;
+  --input-fg: #1F2328;
+  --input-border: #D0D7DE;
+  --input-focus-border: #0969DA;
+  --input-placeholder: #6E7781;
+  
+  /* Modal/Overlay */
+  --modal-overlay: rgba(31, 35, 40, 0.5);
+  --modal-bg: #FFFFFF;
+  
+  /* Scrollbar */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #D0D7DE;
+  --scrollbar-thumb-hover: #ACB4BC;
+  
+  /* Syntax highlighting */
+  --syntax-keyword: #CF222E;
+  --syntax-string: #0A3069;
+  --syntax-comment: #57606A;
+  --syntax-function: #8250DF;
+  --syntax-variable: #0550AE;
+}

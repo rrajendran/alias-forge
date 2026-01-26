@@ -1,0 +1,64 @@
+/**
+ * Theme: Sunset Glow
+ * Description: Modern warm sunset theme with golden amber tones
+ * Type: light
+ */
+
+[data-theme="sunset-glow"] {
+  /* Background colors - warm and inviting */
+  --bg-workbench: #FFF8F0;
+  --bg-editor: #FFFCF8;
+  --bg-hover: #FFF3E6;
+  --bg-active: #FFE8CC;
+  --bg-sidebar: #FFF5EB;
+  
+  /* Foreground colors - rich browns */
+  --fg-primary: #3D2817;
+  --fg-secondary: #6B4423;
+  --fg-muted: #9A6B3D;
+  --fg-disabled: #C19A6B;
+  
+  /* Border colors - warm accents */
+  --border-subtle: #F4DCC3;
+  --border-focus: #FA812F;
+  --border-active: #DD0303;
+  
+  /* Accent colors - sunset palette */
+  --accent-primary: #FA812F;
+  --accent-primary-hover: #E5752A;
+  --accent-success: #D4A017;
+  --accent-warning: #FAB12F;
+  --accent-error: #DD0303;
+  --accent-info: #FA812F;
+  
+  /* Interactive elements - Buttons */
+  --btn-primary-bg: #FA812F;
+  --btn-primary-fg: #FFFFFF;
+  --btn-primary-hover: #E5752A;
+  --btn-secondary-bg: #FFF5EB;
+  --btn-secondary-fg: #3D2817;
+  --btn-secondary-hover: #FFF3E6;
+  
+  /* Interactive elements - Inputs */
+  --input-bg: #FFFFFF;
+  --input-fg: #3D2817;
+  --input-border: #F4DCC3;
+  --input-focus-border: #FA812F;
+  --input-placeholder: #9A6B3D;
+  
+  /* Modal/Overlay */
+  --modal-overlay: rgba(250, 129, 47, 0.25);
+  --modal-bg: #FFFCF8;
+  
+  /* Scrollbar */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #FAB12F;
+  --scrollbar-thumb-hover: #FA812F;
+  
+  /* Syntax highlighting */
+  --syntax-keyword: #DD0303;
+  --syntax-string: #D4A017;
+  --syntax-comment: #9A6B3D;
+  --syntax-function: #FA812F;
+  --syntax-variable: #FAB12F;
+}
