@@ -2,42 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src https://cdnjs.cloudflare.com; script-src 'self'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AliasForge</title>
+  <!-- Theme system CSS -->
+  <link rel="stylesheet" href="../../static/css/themes/themes-base.css">
+  <link rel="stylesheet" href="../../static/css/themes/theme-dark.css">
+  <link rel="stylesheet" href="../../static/css/themes/theme-light.css">
+  <link rel="stylesheet" href="../../static/css/themes/theme-sunset-glow.css">
+  <link rel="stylesheet" href="../../static/css/themes/theme-forest-canopy.css">
   <link rel="stylesheet" href="../../static/css/themes.css">
   <link rel="stylesheet" href="../../static/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Local inline SVG icons used instead of external Font Awesome (CSP compliant) -->
 </head>
-<body data-theme="dark">
+<body data-theme="sunset-glow">
+  <!-- Startup loader overlay -->
+  <div id="startup-loader" class="startup-loader">
+    <div class="loader-content">
+      <div class="spinner" aria-hidden="true"></div>
+      <div class="loader-text">Starting AliasForge...</div>
+    </div>
+  </div>
+  
+  <!-- Window bar (macOS-style) -->
+  <div class="window-bar">
+    <div class="window-controls">
+      <button id="sidebarToggle" class="btn-icon" title="Toggle sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    <div id="windowTitle" class="window-title">AliasForge - Shape your shortcuts once</div>
+  </div>
+
   <!-- Main application container -->
-  <div class="app-container">
+  <div class="app-shell">
     
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1 class="app-title">AliasForge</h1>
-        <p class="app-tagline">Shape your shortcuts once</p>
+        <div class="app-header-row">
+          <img class="app-icon" src="../../assets/icons/png/128x128.png" alt="AliasForge - Shape your shortcuts once">
+          <div class="app-header-text">
+            <h1 class="app-title">AliasForge</h1>
+            <p class="app-tagline">Shape your shortcuts once</p>
+          </div>
+        </div>
         <div class="shell-info" id="shell-info">
           <span class="shell-badge" id="shell-badge">Detecting...</span>
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <section class="sidebar-section">
-        <h2 class="section-title">Quick Actions</h2>
-        <button class="sidebar-button" id="import-aliases">
-          <span class="button-icon">📥</span>
-          Import from Shell
-        </button>
-        <button class="sidebar-button" id="export-aliases">
-          <span class="button-icon">💾</span>
-          Save to Shell
-        </button>
-      </section>
-
-      <!-- Tags -->
-      <section class="sidebar-section">
-        <h2 class="section-title">Filter by Tags</h2>
+      <!-- Tag filters (moved here from main) -->
+      <section class="sidebar-section" id="sidebar-tags-section">
+        <h2 class="section-title">Tags</h2>
         <div class="tag-filters" id="tag-filters">
           <button class="tag-chip active" data-tag="all">All</button>
         </div>
@@ -55,9 +73,20 @@
             <span class="stat-label">Enabled</span>
             <span class="stat-value" id="stat-enabled">0</span>
           </div>
+          <div class="stat-item">
+            <span class="stat-label">Duplicates</span>
+            <span class="stat-value" id="stat-duplicates">0</span>
+          </div>
         </div>
       </section>
+
+      <!-- Sidebar controls -->
+
+      <!-- Settings button removed from sidebar -->
     </aside>
+
+    <!-- Sidebar resizer (drag the vertical bar to resize the sidebar) -->
+    <div id="sidebar-resizer" class="sidebar-resizer" title="Drag to resize sidebar" aria-hidden="false"></div>
 
     <!-- Main content area -->
     <main class="main-content">
@@ -76,13 +105,139 @@
             <div class="search-bar">
               <input type="text" id="alias-search" placeholder="Search aliases..." class="search-input">
             </div>
-            <button class="btn-primary" id="add-alias">+ New Alias</button>
+
+            <div class="content-actions">
+              <!-- Bulk actions dropdown (hidden by default) -->
+              <div class="bulk-actions-container" id="bulk-actions-container" style="display: none;">
+                <span class="bulk-selection-count" id="bulk-selection-count">0 selected</span>
+                <button class="btn-secondary dropdown-toggle" id="bulk-actions-btn">
+                  Bulk Actions
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <div class="dropdown-menu" id="bulk-actions-menu">
+                  <button class="dropdown-item" data-action="update-tags">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="7" cy="7" r="1" fill="currentColor"/>
+                    </svg>
+                    Update Tags
+                  </button>
+                  <button class="dropdown-item" data-action="update-prefix">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M4 7h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M10 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M4 17h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Update Prefix
+                  </button>
+                  <button class="dropdown-item" data-action="enable">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Enable
+                  </button>
+                  <button class="dropdown-item" data-action="disable">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M15 9l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M9 9l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    Disable
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-item" data-action="remove-duplicates">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                      <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    Remove Duplicates
+                  </button>
+                  <button class="dropdown-item danger" data-action="delete">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M3 6h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Delete
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Import dropdown -->
+              <div class="action-dropdown-container">
+                <button class="btn-secondary dropdown-toggle" id="import-btn" title="Import aliases" data-tooltip="Import aliases">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 15V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Import</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="dropdown-arrow">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <div class="dropdown-menu" id="import-menu">
+                  <button class="dropdown-item" id="import-from-shell">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M4 17l6-6-6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 19h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Import from Shell
+                  </button>
+                  <button class="dropdown-item" id="import-from-file">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M13 2v7h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Import from File
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Export dropdown -->
+              <div class="action-dropdown-container">
+                <button class="btn-secondary dropdown-toggle" id="export-btn" title="Save aliases" data-tooltip="Save aliases">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M17 21v-8H7v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 3v5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Save</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="dropdown-arrow">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <div class="dropdown-menu" id="export-menu">
+                  <button class="dropdown-item" id="export-to-shell">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M4 17l6-6-6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 19h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Save to Shell
+                  </button>
+                  <button class="dropdown-item" id="export-to-file">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M13 2v7h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Save to File
+                  </button>
+                </div>
+              </div>
+              
+              <button class="btn-primary" id="add-alias" title="Create a new alias" data-tooltip="Create a new alias">+ New Alias</button>
+            </div>
           </div>
 
           <div class="alias-list-container">
             <table class="alias-table">
               <thead>
                 <tr>
+                  <th class="checkbox-col">
+                    <input type="checkbox" id="select-all-checkbox" class="select-all-checkbox" title="Select all">
+                  </th>
                   <th class="sortable" data-sort="name">Name <span class="sort-indicator"></span></th>
                   <th class="sortable" data-sort="command">Command <span class="sort-indicator"></span></th>
                   <th class="sortable" data-sort="description">Description <span class="sort-indicator"></span></th>
@@ -93,7 +248,7 @@
               </thead>
               <tbody id="alias-table-body">
                 <tr class="empty-state">
-                  <td colspan="6">
+                  <td colspan="7">
                     <div class="empty-message">
                       <p>No aliases yet</p>
                       <p class="empty-hint">Click "Import from Shell" to load existing aliases or "New Alias" to create one</p>
@@ -109,46 +264,119 @@
 
         <!-- Settings tab -->
         <div class="tab-pane" id="settings-pane">
-          <div class="settings-container">
-            <h2>Settings</h2>
-            
-            <section class="settings-section">
+          <!-- Appearance Panel -->
+          <div class="settings-panel">
+            <div class="panel-header">
+              <i class="fas fa-palette"></i>
               <h3>Appearance</h3>
+            </div>
+            <div class="panel-body">
               <div class="setting-item">
-                <label for="theme-toggle">Theme</label>
-                <select id="theme-toggle" class="setting-input">
-                  <option value="dark">Dark</option>
-                  <option value="light">Light</option>
+                <label for="theme-select">Color Theme</label>
+                <select id="theme-select" class="setting-input">
+                  <!-- Options populated dynamically by theme manager -->
                 </select>
+                <small class="form-hint">Choose your preferred color scheme</small>
               </div>
-            </section>
-            
-            <section class="settings-section">
+            </div>
+          </div>
+          
+          <!-- Display Panel -->
+          <div class="settings-panel">
+            <div class="panel-header">
+              <i class="fas fa-display"></i>
               <h3>Display</h3>
+            </div>
+            <div class="panel-body">
               <div class="setting-item">
                 <label for="page-size">Items per page</label>
                 <input type="number" id="page-size" class="setting-input" min="5" max="100" value="10">
+                <small class="form-hint">Number of aliases to display per page</small>
               </div>
-            </section>
+            </div>
+          </div>
 
-            <section class="settings-section">
+          <!-- Export Paths Panel -->
+          <div class="settings-panel">
+            <div class="panel-header">
+              <i class="fas fa-folder-open"></i>
               <h3>Export Paths</h3>
+            </div>
+            <div class="panel-body">
               <div id="export-paths">
                 <!-- Will be populated dynamically based on platform -->
               </div>
-            </section>
+            </div>
+          </div>
 
-            <section class="settings-section">
+          <!-- Backup Panel -->
+          <div class="settings-panel">
+            <div class="panel-header">
+              <i class="fas fa-clock-rotate-left"></i>
               <h3>Backup</h3>
+            </div>
+            <div class="panel-body">
               <div class="setting-item">
                 <label for="backup-count">Backups to keep</label>
                 <input type="number" id="backup-count" class="setting-input" min="1" max="20" value="5">
+                <small class="form-hint">Maximum number of backup files to retain</small>
               </div>
-            </section>
-
-            <div class="settings-actions">
-              <button class="btn-primary" id="save-settings">Save Settings</button>
             </div>
+          </div>
+
+          <!-- Updates Panel -->
+          <div class="settings-panel">
+            <div class="panel-header">
+              <i class="fas fa-cloud-arrow-down"></i>
+              <h3>Updates</h3>
+            </div>
+            <div class="panel-body">
+              <div class="setting-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-weight: 600; margin-bottom: 4px;">Check for Updates</div>
+                    <small class="form-hint">Keep AliasForge up to date with the latest features</small>
+                  </div>
+                  <button class="btn-secondary" id="check-updates-btn">
+                    <i class="fas fa-sync"></i>
+                    Check Now
+                  </button>
+                </div>
+                <div id="update-status" style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; display: none;">
+                  <div id="update-message"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Support Panel -->
+          <div class="settings-panel">
+            <div class="panel-header">
+              <i class="fas fa-heart"></i>
+              <h3>Support Development</h3>
+            </div>
+            <div class="panel-body">
+              <div class="support-content">
+                <p style="color: var(--fg-secondary); margin-bottom: 16px;">If you find AliasForge helpful, consider supporting its development!</p>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <div style="flex: 1;">
+                    <div style="font-weight: 600; margin-bottom: 4px;">Buy me a coffee ☕</div>
+                    <small class="form-hint">Created by Ramesh Rajendran</small>
+                  </div>
+                  <a href="https://www.buymeacoffee.com/ramesh.rajendran" target="_blank" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-mug-hot"></i>
+                    Support
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn-primary" id="save-settings" title="Save settings" data-tooltip="Save settings">
+              <i class="fas fa-floppy-disk"></i>
+              Save Settings
+            </button>
           </div>
         </div>
 
@@ -177,7 +405,10 @@
 
         <div class="form-group">
           <label for="alias-tags">Tags</label>
-          <input type="text" id="alias-tags" class="form-input" placeholder="git, docker, etc. (comma-separated)">
+          <div class="autocomplete-wrapper">
+            <input type="text" id="alias-tags" class="form-input" placeholder="git, docker, etc. (comma-separated)">
+            <div class="autocomplete-dropdown" id="alias-tag-autocomplete-dropdown"></div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -199,6 +430,106 @@
     <span class="toast-message" id="toast-message"></span>
   </div>
 
+  <!-- Confirmation Dialog -->
+  <div class="dialog-overlay" id="confirmation-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h3 id="confirmation-title">Confirm Action</h3>
+      </div>
+      <div class="dialog-body">
+        <p id="confirmation-message">Are you sure?</p>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-secondary" id="confirmation-cancel">Cancel</button>
+        <button class="btn-primary btn-danger" id="confirmation-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Tags Dialog -->
+  <div class="dialog-overlay" id="update-tags-dialog">
+    <div class="dialog-content dialog-large">
+      <div class="dialog-header">
+        <h3>Update Tags for Selected Aliases</h3>
+        <button class="modal-close" id="update-tags-close">&times;</button>
+      </div>
+      <div class="dialog-body">
+        <div class="form-group">
+          <label>Current Tags</label>
+          <div class="tags-display" id="bulk-tags-display">
+            <span class="empty-tags-message">No common tags</span>
+          </div>
+          <small class="form-hint">Click × to remove a tag from all selected aliases</small>
+        </div>
+        <div class="form-group">
+          <label for="bulk-tag-input">Add Tag</label>
+          <div class="autocomplete-wrapper">
+            <input type="text" id="bulk-tag-input" class="form-input" placeholder="Type to search or add new tag..." autocomplete="off">
+            <div class="autocomplete-dropdown" id="tag-autocomplete-dropdown"></div>
+          </div>
+          <small class="form-hint">Select existing tag or type new tag name and press Enter</small>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-secondary" id="bulk-tags-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Prefix Dialog -->
+  <div class="dialog-overlay" id="update-prefix-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h3>Update Prefix for Alias Names</h3>
+      </div>
+      <div class="dialog-body">
+        <div id="current-prefix-info" class="current-value-info" style="display: none;">
+          <label>Current Common Prefix</label>
+          <div class="current-value-display">
+            <code id="current-prefix-value"></code>
+          </div>
+          <small class="form-hint">Detected from selected aliases</small>
+        </div>
+        <div class="form-group">
+          <label for="bulk-prefix-input">New Prefix</label>
+          <input type="text" id="bulk-prefix-input" class="form-input" placeholder="e.g., my_, dev_, prod_">
+          <small class="form-hint">Enter new prefix to add/replace, or leave empty to remove current prefix</small>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="replace-prefix-checkbox" checked>
+            <span>Replace existing prefix if found</span>
+          </label>
+          <small class="form-hint">If unchecked, will add to beginning regardless of existing prefix</small>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-secondary" id="bulk-prefix-cancel">Cancel</button>
+        <button class="btn-primary" id="bulk-prefix-confirm">Update Prefix</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Error Dialog -->
+  <div class="dialog-overlay" id="validation-error-dialog">
+    <div class="dialog-content dialog-large">
+      <div class="dialog-header">
+        <h3>Import Validation Failed</h3>
+        <button class="modal-close" id="validation-error-close">&times;</button>
+      </div>
+      <div class="dialog-body">
+        <div class="validation-summary" id="validation-summary"></div>
+        <div class="validation-errors" id="validation-errors"></div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-secondary" id="validation-exit">Exit</button>
+        <button class="btn-primary" id="validation-continue">Continue with Valid Aliases</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../static/js/theme-manager.js"></script>
+  <script src="../../static/js/sidebar-manager.js"></script>
   <script src="../../static/js/main.js"></script>
 </body>
 </html>

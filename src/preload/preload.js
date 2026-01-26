@@ -16,7 +16,9 @@ const ALLOWED_CHANNELS = {
   settings: ["settings:load", "settings:save"],
   aliases: ["aliases:load", "aliases:save", "aliases:import", "aliases:export"],
   shell: ["shell:detect"],
-  file: ["file:read", "file:write", "file:backup"]
+  file: ["file:read", "file:write", "file:backup"],
+  updater: ["updater:check"],
+  tray: ["tray:get-config", "tray:set-config"]
 };
 
 /**
@@ -72,7 +74,10 @@ contextBridge.exposeInMainWorld("api", {
     read: (filePath) => invokeSecure("file:read", filePath),
     write: (filePath, content) => invokeSecure("file:write", filePath, content),
     backup: (filePath) => invokeSecure("file:backup", filePath)
-  }
+  },
+
+  // General invoke for any allowed channel
+  invoke: (channel, ...args) => invokeSecure(channel, ...args)
 });
 
 // Expose version info

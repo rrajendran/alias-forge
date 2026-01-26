@@ -4,6 +4,10 @@ const fs = require("fs").promises;
 const { exec } = require("child_process");
 const { promisify } = require("util");
 
+// Import updater and tray modules
+const updater = require("./updater");
+const tray = require("./tray");
+
 const execAsync = promisify(exec);
 let mainWindow = null;
 
@@ -15,13 +19,14 @@ function createMainWindow() {
   let iconPath;
   if (process.platform === "darwin") {
     // macOS: use .icns file
-    iconPath = path.join(__dirname, "../../assets/icons/mac/icon.icns");
+    iconPath = path.join(__dirname, "../assets/icons/mac/icon.icns");
   } else if (process.platform === "win32") {
     // Windows: use .ico file
-    iconPath = path.join(__dirname, "../../assets/icons/win/icon.ico");
+    iconPath = path.join(__dirname, "../assets/icons/win/icon.ico");
   } else {
     // Linux: use .png file
-    iconPath = path.join(__dirname, "../../assets/icons/icon.png");
+    // Use a packaged PNG icon from the assets folder
+    iconPath = path.join(__dirname, "../assets/icons/png/128x128.png");
   }
 
   mainWindow = new BrowserWindow({
@@ -31,6 +36,7 @@ function createMainWindow() {
     minHeight: 600,
     backgroundColor: "#1E1E1E",
     icon: iconPath,
+    titleBarStyle: 'hiddenInset', // macOS: traffic lights visible, title bar area available for custom content
     webPreferences: {
       preload: path.join(__dirname, "../preload/preload.js"),
       contextIsolation: true,
@@ -45,6 +51,7 @@ function createMainWindow() {
   // Show window when ready to avoid flash
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
+    mainWindow.maximize();
   });
 
   // Open DevTools in development mode
@@ -104,16 +111,44 @@ app.whenReady().then(async () => {
   await setupIpcHandlers();
   createMainWindow();
 
+  // Initialize updater (production only)
+  if (!app.isPackaged && !process.argv.includes("--dev")) {
+    // Skip updater in development
+  } else if (app.isPackaged) {
+    updater.init(mainWindow);
+  }
+
+  // Initialize tray
+  tray.init(mainWindow);
+
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createMainWindow();
+      tray.init(mainWindow);
+    } else {
+      tray.showMainWindow();
     }
   });
 });
 
 app.on("window-all-closed", () => {
+  // On macOS with tray mode, keep app running
+  if (process.platform === "darwin" && tray.config.trayOnly) {
+    return;
+  }
+  
   if (process.platform !== "darwin") {
     app.quit();
+  }
+});
+
+app.on("before-quit", () => {
+  // Cleanup
+  if (updater) {
+    updater.cleanup();
+  }
+  if (tray) {
+    tray.cleanup();
   }
 });
 
@@ -273,6 +308,21 @@ async function setupIpcHandlers() {
       return { success: true, backupPath };
     } catch (err) {
       console.error("Failed to backup file:", err);
+      return { success: false, error: err.message };
+    }
+  });
+
+  // Updater check
+  ipcMain.handle("updater:check", async () => {
+    try {
+      if (updater && typeof updater.checkForUpdates === 'function') {
+        await updater.checkForUpdates(false);
+        // Return result will come via update events
+        return { success: true, checking: true };
+      }
+      return { success: false, error: 'Updater not available' };
+    } catch (err) {
+      console.error("Failed to check for updates:", err);
       return { success: false, error: err.message };
     }
   });
