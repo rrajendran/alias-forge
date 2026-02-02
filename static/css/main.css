@@ -31,16 +31,18 @@ body {
    Window Bar (macOS-style)
    ============================================ */
 .window-bar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 38px;
-  background: transparent;
+  height: 40px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   -webkit-app-region: drag;
   z-index: 1000;
+  backdrop-filter: blur(20px);
 }
 
 .window-controls {
@@ -62,12 +64,12 @@ body {
 }
 
 .btn-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: none;
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border-radius: var(--radius-sm);
-  color: var(--fg-primary);
+  color: var(--fg-secondary);
   cursor: pointer;
   transition: all var(--transition-base);
   display: flex;
@@ -78,7 +80,7 @@ body {
 }
 
 .btn-icon:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--fg-primary);
 }
 
@@ -95,12 +97,12 @@ body {
    Modern Layout
    ============================================ */
 .app-shell {
-  margin-top:35px;
   display: flex;
   height: 100vh;
   width: 100vw;
   gap: 0;
   position: relative;
+  padding-top: 40px; /* Space for window-bar */
 }
 
 /* Modern Sidebar Resizer */
@@ -1718,23 +1720,6 @@ body {
     transform: translateY(0);
     opacity: 1;
   }
-}
-
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 12px 20px;
-  background-color: var(--surface-bg);
-  border: none;
-  border-radius: var(--ui-radius-sm);
-  box-shadow: var(--elevation-2);
-  transform: translateY(100px);
-  opacity: 0;
-  transition: all 0.28s cubic-bezier(.2,.9,.2,1);
-  z-index: 2000;
-  color: var(--fg-primary);
-  margin: 0;
 }
 
 .dialog-body {
